@@ -11,12 +11,12 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
     hmr: {
-      host: 'localhost',
+      host: 'symfony.local',
     },
     watch: {
       usePolling: true,
     },
-    allowedHosts: ['symfony.local', 'localhost'],
+    allowedHosts: ['symfony.local'],
   },
   resolve: {
     alias: {

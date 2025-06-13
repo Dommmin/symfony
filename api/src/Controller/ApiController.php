@@ -7,7 +7,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ApiController extends AbstractController
 {
-    #[Route('/', name: 'api_index', methods: ['GET'])]
+    #[Route('', name: 'api_index', methods: ['GET'])]
     public function __invoke()
     {
         return $this->json([
