@@ -1,10 +1,24 @@
-import React from 'react'
+import {useEffect, useState} from "react";
+import axios from "axios";
 
 export default function Home() {
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        axios
+            .get(import.meta.env.VITE_API_URL)
+            .then(response => {
+                setMessage(response.data.message);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+
+    }, [])
   return (
     <div>
       <h1 className="text-3xl font-bold underline">Welcome to Home Page</h1>
-      <p>This is the default route for our application.</p>
+      <p>{message}</p>
     </div>
   )
 } 
