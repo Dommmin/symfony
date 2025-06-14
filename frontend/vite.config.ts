@@ -18,8 +18,8 @@ export default defineConfig({
     },
     allowedHosts: ['symfony.local'],
   },
-  esbuild: {
-    jsx: 'automatic',
+  build: {
+    outDir: 'build',
   },
   resolve: {
     alias: {
