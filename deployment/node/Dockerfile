@@ -5,7 +5,7 @@ WORKDIR /app
 COPY ./frontend/package*.json ./frontend/vite.config.ts ./frontend/tsconfig.json ./
 RUN npm ci
 
-COPY production/node/.env .env
+COPY deployment/node/.env .env
 
 COPY ./frontend .
 

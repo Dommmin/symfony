@@ -16,9 +16,9 @@ COPY ./api/composer.json ./api/composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
 COPY --chown=appuser:appuser ./api .
-COPY --chown=appuser:appuser ./production/php/supervisord.conf /etc/supervisord.conf
-COPY --chown=appuser:appuser ./production/php/php.ini /usr/local/etc/php/php.ini
-COPY --chown=appuser:appuser ./production/php/www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY --chown=appuser:appuser ./deployment/php/supervisord.conf /etc/supervisord.conf
+COPY --chown=appuser:appuser ./deployment/php/php.ini /usr/local/etc/php/php.ini
+COPY --chown=appuser:appuser ./deployment/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 USER appuser
 
