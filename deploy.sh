@@ -23,7 +23,7 @@ docker compose up -d --force-recreate
 echo "🔧 Running application maintenance tasks..."
 docker compose exec -T php php bin/console cache:clear --env=prod
 docker compose exec -T php php bin/console cache:warmup --env=prod
-docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction
+# docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction
 
 # Cleanup old Docker objects
 echo "🧹 Cleaning up unused Docker resources..."
