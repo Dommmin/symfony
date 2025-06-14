@@ -1,0 +1,39 @@
+services:
+  php:
+    image: ${REGISTRY}/${PHP_IMAGE_NAME}:${TAG:-latest}
+    container_name: symfony_php
+    restart: unless-stopped
+    networks:
+      - symfony_network
+    depends_on:
+      - redis
+
+  nginx:
+    image: ${REGISTRY}/${NGINX_IMAGE_NAME}:${TAG:-latest}
+    container_name: symfony_nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    networks:
+      - symfony_network
+    depends_on:
+      - php
+      - redis
+
+  redis:
+    image: redis:alpine
+    container_name: symfony_redis
+    restart: unless-stopped
+    networks:
+      - symfony_network
+    volumes:
+      - redis_data:/data
+
+networks:
+  symfony_network:
+    driver: bridge
+
+volumes:
+  symfony_storage:
+  redis_data:
