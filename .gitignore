@@ -32,3 +32,5 @@ api/config/secrets/prod/prod.decrypt.private.php
 api/public/bundles/
 api/var/cache/
 api/vendor/
+
+frontend/build/
