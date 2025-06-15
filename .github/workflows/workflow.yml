@@ -82,6 +82,7 @@ jobs:
           platforms: linux/amd64
           build-contexts: |
             node=docker-image://${{ env.REGISTRY }}/${{ env.NODE_IMAGE_NAME }}:latest
+            php=docker-image://${{ env.REGISTRY }}/${{ env.PHP_IMAGE_NAME }}:latest
 
   deploy:
    name: 🚀 Deploy to Production
