@@ -7,6 +7,11 @@ services:
       - symfony_network
     depends_on:
       - redis
+    volumes:
+      - .env:/var/www/html/.env:ro
+      - ./data/symfony-logs:/var/www/html/var/log
+      - ./data/symfony-cache:/var/www/html/var/cache
+      - ./data/uploads:/var/www/html/public/uploads
 
   nginx:
     image: ${REGISTRY}/${NGINX_IMAGE_NAME}:${TAG:-latest}
@@ -20,6 +25,9 @@ services:
     depends_on:
       - php
       - redis
+    volumes:
+      - ./data/nginx-logs:/var/log/nginx
+      - ./data/uploads:/var/www/html/public/uploads:ro
 
   redis:
     image: redis:alpine
@@ -35,5 +43,4 @@ networks:
     driver: bridge
 
 volumes:
-  symfony_storage:
   redis_data:
