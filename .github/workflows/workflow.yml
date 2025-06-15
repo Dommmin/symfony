@@ -44,8 +44,8 @@ jobs:
       - name: Create .env files
         run: |
           mkdir -p deployment/node deployment/php
-          echo "${{ vars.ENV_FILE }}" > deployment/node/.env
-          echo "${{ vars.ENV_FILE }}" > deployment/php/.env
+          printf '%s\n' '${{ vars.ENV_FILE }}' > deployment/node/.env
+          printf '%s\n' '${{ vars.ENV_FILE }}' > deployment/php/.env
           cat deployment/node/.env
 
       - name: Build and push Node builder image
@@ -106,7 +106,7 @@ jobs:
 
      - name: Prepare environment file
        run: |
-         echo "${{ vars.ENV_FILE }}" > .env
+         printf '%s\n' '${{ vars.ENV_FILE }}' > .env
          {
            echo "REGISTRY=${{ env.REGISTRY }}"
            echo "PHP_IMAGE_NAME=${{ env.PHP_IMAGE_NAME }}"
