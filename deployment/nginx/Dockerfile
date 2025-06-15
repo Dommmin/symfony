@@ -1,7 +1,7 @@
 FROM nginx:stable-alpine
 
 COPY --from=node /app/build /usr/share/nginx/html/
-COPY ./deployment/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY ./deployment/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 EXPOSE 443
