@@ -7,9 +7,3 @@ nelmio_cors:
         expose_headers: ['Link']
         max_age: 3600
         allow_credentials: true
-    paths:
-        '^/':
-            allow_origin: ['http://symfony.local', 'http://api.symfony.local']
-            allow_headers: ['*']
-            allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
-            allow_credentials: true 
