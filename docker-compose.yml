@@ -34,8 +34,6 @@ services:
     working_dir: /app
     volumes:
       - ./frontend:/app:cached
-    environment:
-      - VITE_API_URL=http://api.symfony.local
     ports:
       - "5173:5173"
     depends_on:
