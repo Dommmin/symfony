@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { AuthResponse, CreateIssueDto, Issue, LoginDto, RegisterDto, UpdateIssueDto } from '@/types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://api.symfony.local';
 
 const api = axios.create({
   baseURL: API_URL,
