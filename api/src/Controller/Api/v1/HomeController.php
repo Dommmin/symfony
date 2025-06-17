@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/v1', name: 'api_v1_')]
 class HomeController extends AbstractController
 {
     #[Route('', name: 'index', methods: ['GET'])]
