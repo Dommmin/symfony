@@ -1,4 +1,4 @@
-.PHONY: up down build shell
+.PHONY: up down build shell frontend
 
 build:
 	docker compose build
