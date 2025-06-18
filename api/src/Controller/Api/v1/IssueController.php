@@ -40,26 +40,26 @@ class IssueController extends AbstractController
         $queryBuilder = $issueRepository->createQueryBuilder('i')
             ->orderBy('i.id', 'DESC');
 
-        // Apply filters
-        if ($requestedUser = $request->query->get('user')) {
-            $queryBuilder->andWhere('i.user = :user')
-                ->setParameter('user', $requestedUser);
-        } else {
-            $queryBuilder->andWhere('i.user = :user')
-                ->setParameter('user', $user);
-        }
-
-        if ($status = $request->query->get('status')) {
-            $queryBuilder->andWhere('i.issueStatus = :status')
-                ->setParameter('status', $status);
-        }
+//        // Apply filters
+//        if ($requestedUser = $request->query->get('user')) {
+//            $queryBuilder->andWhere('i.user = :user')
+//                ->setParameter('user', $requestedUser);
+//        } else {
+//            $queryBuilder->andWhere('i.user = :user')
+//                ->setParameter('user', $user);
+//        }
+//
+//        if ($status = $request->query->get('status')) {
+//            $queryBuilder->andWhere('i.issueStatus = :status')
+//                ->setParameter('status', $status);
+//        }
 
         $pagerfanta = new Pagerfanta(new QueryAdapter($queryBuilder));
         $pagerfanta->setMaxPerPage($limit);
         $pagerfanta->setCurrentPage($page);
 
         $results = iterator_to_array($pagerfanta->getCurrentPageResults());
-        
+
         $data = array_map(fn($i): array => [
             'id' => $i->getId(),
             'title' => $i->getTitle(),
