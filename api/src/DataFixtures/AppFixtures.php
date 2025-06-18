@@ -97,6 +97,86 @@ class AppFixtures extends Fixture
                 'Problem z Microsoft Teams',
                 'Aplikacja Teams zawiesza się podczas połączeń video.',
                 IssueStatus::NEW
+            ],
+            [
+                'Wymiana klawiatury',
+                'Klawiatura w moim laptopie przestała działać, kilka klawiszy nie reaguje.',
+                IssueStatus::NEW
+            ],
+            [
+                'Problemy z wydajnością komputera',
+                'Komputer działa bardzo wolno, potrzebna diagnostyka i optymalizacja.',
+                IssueStatus::IN_PROGRESS
+            ],
+            [
+                'Konfiguracja nowego monitora',
+                'Proszę o pomoc w konfiguracji nowego monitora Dell U2419H.',
+                IssueStatus::DONE
+            ],
+            [
+                'Aktualizacja antywirusa',
+                'Program antywirusowy wymaga aktualizacji do najnowszej wersji.',
+                IssueStatus::NEW
+            ],
+            [
+                'Problem z Outlook',
+                'Outlook nie synchronizuje się z serwerem Exchange.',
+                IssueStatus::IN_PROGRESS
+            ],
+            [
+                'Instalacja nowego oprogramowania',
+                'Proszę o instalację pakietu Adobe Creative Suite.',
+                IssueStatus::DONE
+            ],
+            [
+                'Backup danych',
+                'Proszę o wykonanie backupu danych z mojego komputera przed formatowaniem.',
+                IssueStatus::NEW
+            ],
+            [
+                'Problemy z drukarką sieciową',
+                'Drukarka sieciowa w dziale marketingu drukuje z bardzo słabą jakością.',
+                IssueStatus::IN_PROGRESS
+            ],
+            [
+                'Konfiguracja poczty na telefonie',
+                'Potrzebuję pomocy w konfiguracji poczty służbowej na telefonie iPhone.',
+                IssueStatus::DONE
+            ],
+            [
+                'Wymiana dysku',
+                'Dysk w moim komputerze wydaje niepokojące dźwięki, proszę o wymianę.',
+                IssueStatus::NEW
+            ],
+            [
+                'Problem z dostępem do SharePoint',
+                'Nie mogę uzyskać dostępu do firmowego SharePointa.',
+                IssueStatus::IN_PROGRESS
+            ],
+            [
+                'Aktualizacja sterowników',
+                'Proszę o aktualizację sterowników karty graficznej.',
+                IssueStatus::DONE
+            ],
+            [
+                'Konfiguracja drukarki',
+                'Potrzebuję pomocy w konfiguracji nowej drukarki.',
+                IssueStatus::NEW
+            ],
+            [
+                'Problem z WiFi',
+                'Słaby zasięg WiFi w sali konferencyjnej.',
+                IssueStatus::IN_PROGRESS
+            ],
+            [
+                'Instalacja Windows 11',
+                'Proszę o aktualizację systemu do Windows 11.',
+                IssueStatus::NEW
+            ],
+            [
+                'Konfiguracja Firewall',
+                'Proszę o dostosowanie reguł Firewall dla nowej aplikacji.',
+                IssueStatus::IN_PROGRESS
             ]
         ];
 
