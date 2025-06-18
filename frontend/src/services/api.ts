@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import type { AuthResponse, CreateIssueDto, Issue, LoginDto, RegisterDto, UpdateIssueDto, User } from '@/types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://api.symfony.local';
@@ -8,17 +9,37 @@ const api = axios.create({
   baseURL: `${API_URL}/${API_VERSION}`,
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
   },
+  withCredentials: true,
 });
 
-// Add token to requests if it exists
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+// Add token to requests if it exists in authStore
+api.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
+
+// Handle 401 responses
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      useAuthStore.getState().setToken(null);
+      useAuthStore.getState().setUser(null);
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const authApi = {
   login: async (data: LoginDto): Promise<AuthResponse> => {
