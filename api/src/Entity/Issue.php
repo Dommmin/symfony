@@ -7,7 +7,9 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use App\Repository\IssueRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: IssueRepository::class)]
@@ -17,10 +19,9 @@ class Issue
     use TimestampableTrait;
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[Groups(['user:read', 'admin:read'])]
-    private ?int $id = null; /** @phpstan-ignore-line */
+    private ?Uuid $id = null;
 
     #[ORM\Column(name: 'status', enumType: IssueStatus::class)]
     #[Groups(['user:read', 'issue:write', 'admin:read'])]
@@ -49,7 +50,12 @@ class Issue
     #[Assert\NotBlank]
     private ?User $user = null;
 
-    public function getId(): ?int
+    public function __construct()
+    {
+        $this->id = Uuid::v7();
+    }
+
+    public function getId(): ?Uuid
     {
         return $this->id;
     }

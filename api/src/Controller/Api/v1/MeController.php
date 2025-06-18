@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\v1;
 
+use App\DTO\UserResponseDTO;
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use App\Entity\User;
 
 class MeController extends AbstractController
 {
@@ -19,10 +20,6 @@ class MeController extends AbstractController
             throw $this->createAccessDeniedException('Not authenticated');
         }
 
-        return $this->json([
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-            'roles' => $user->getRoles(),
-        ]);
+        return $this->json(UserResponseDTO::fromEntity($user));
     }
 }
