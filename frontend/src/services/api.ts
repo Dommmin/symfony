@@ -5,6 +5,8 @@ import type {
     CreateTechnicianDto,
     Issue,
     LoginDto,
+    PaginatedResponse,
+    PaginationParams,
     RegisterDto,
     Technician,
     UpdateIssueDto,
@@ -70,9 +72,14 @@ export const authApi = {
 };
 
 export const issuesApi = {
-    getIssues: async (): Promise<Issue[]> => {
-        const response = await api.get<{ items: Issue[] }>('/issues');
-        return response.data.items;
+    getIssues: async (params?: PaginationParams): Promise<PaginatedResponse<Issue>> => {
+        const response = await api.get<PaginatedResponse<Issue>>('/issues', {
+            params: {
+                page: params?.page || 1,
+                perPage: params?.perPage || 10,
+            },
+        });
+        return response.data;
     },
 
     getIssue: async (id: number): Promise<Issue> => {

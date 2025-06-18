@@ -18,9 +18,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { issuesApi, techniciansApi } from '@/services/api';
-import type { Issue, Technician, UpdateIssueDto } from '@/types';
+import type { Issue, PaginatedResponse, Technician, UpdateIssueDto } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Filter, MoreHorizontal, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Filter, MoreHorizontal, Search } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -59,12 +59,14 @@ export const IssuesList = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<Issue['status'] | 'all'>('all');
     const [priorityFilter, setPriorityFilter] = useState<Issue['priority'] | 'all'>('all');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [perPage] = useState(10);
     const queryClient = useQueryClient();
     const navigate = useNavigate();
 
-    const { data: issues, isLoading } = useQuery({
-        queryKey: ['issues'],
-        queryFn: issuesApi.getIssues,
+    const { data: issuesData, isLoading } = useQuery({
+        queryKey: ['issues', currentPage, perPage],
+        queryFn: () => issuesApi.getIssues({ page: currentPage, perPage }),
     });
 
     const { data: technicians } = useQuery({
@@ -83,7 +85,7 @@ export const IssuesList = () => {
         },
     });
 
-    const filteredIssues = (issues || []).filter((issue) => {
+    const filteredIssues = (issuesData?.items || []).filter((issue) => {
         const matchesSearch =
             issue.title.toLowerCase().includes(searchQuery.toLowerCase()) || issue.description.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesStatus = statusFilter === 'all' || issue.status === statusFilter;
@@ -108,11 +110,15 @@ export const IssuesList = () => {
         });
     };
 
+    const handlePageChange = (newPage: number) => {
+        setCurrentPage(newPage);
+    };
+
     if (isLoading) {
         return <div>Ładowanie...</div>;
     }
 
-    if (!issues) {
+    if (!issuesData) {
         return <div>Brak zgłoszeń</div>;
     }
 
@@ -188,28 +194,62 @@ export const IssuesList = () => {
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <Badge className={`${statusColors[issue.status]} text-white`}>
-                                        {statusLabels[issue.status]}
-                                    </Badge>
+                                    <Select value={issue.status} onValueChange={(value) => handleStatusChange(issue.id, value as Issue['status'])}>
+                                        <SelectTrigger>
+                                            <SelectValue>
+                                                <Badge className={`${statusColors[issue.status]} text-white`}>
+                                                    {statusLabels[issue.status]}
+                                                </Badge>
+                                            </SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.entries(statusLabels).map(([value, label]) => (
+                                                <SelectItem key={value} value={value}>
+                                                    <Badge className={`${statusColors[value as Issue['status']]} text-white`}>
+                                                        {label}
+                                                    </Badge>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </TableCell>
                                 <TableCell>
-                                    <Badge className={`${priorityColors[issue.priority]} text-white`}>
-                                        {priorityLabels[issue.priority]}
-                                    </Badge>
+                                    <Select value={issue.priority} onValueChange={(value) => handlePriorityChange(issue.id, value as Issue['priority'])}>
+                                        <SelectTrigger>
+                                            <SelectValue>
+                                                <Badge className={`${priorityColors[issue.priority]} text-white`}>
+                                                    {priorityLabels[issue.priority]}
+                                                </Badge>
+                                            </SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.entries(priorityLabels).map(([value, label]) => (
+                                                <SelectItem key={value} value={value}>
+                                                    <Badge className={`${priorityColors[value as Issue['priority']]} text-white`}>
+                                                        {label}
+                                                    </Badge>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </TableCell>
                                 <TableCell>{new Date(issue.createdAt).toLocaleString()}</TableCell>
                                 <TableCell>
                                     <Select
-                                        value={issue.technician?.id?.toString() || UNASSIGNED_VALUE}
+                                        value={issue.technician ? String(issue.technician.id) : UNASSIGNED_VALUE}
                                         onValueChange={(value) => handleTechnicianAssign(issue.id, value)}
                                     >
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Wybierz technika" />
+                                        <SelectTrigger>
+                                            <SelectValue>
+                                                {issue.technician
+                                                    ? `${issue.technician.firstName} ${issue.technician.lastName}`
+                                                    : 'Nieprzypisany'}
+                                            </SelectValue>
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value={UNASSIGNED_VALUE}>Brak przypisania</SelectItem>
-                                            {technicians?.map((technician: Technician) => (
-                                                <SelectItem key={technician.id} value={technician.id.toString()}>
+                                            <SelectItem value={UNASSIGNED_VALUE}>Nieprzypisany</SelectItem>
+                                            {technicians?.map((technician) => (
+                                                <SelectItem key={technician.id} value={String(technician.id)}>
                                                     {technician.firstName} {technician.lastName}
                                                 </SelectItem>
                                             ))}
@@ -220,35 +260,15 @@ export const IssuesList = () => {
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <span className="sr-only">Otwórz menu</span>
                                                 <MoreHorizontal className="h-4 w-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuLabel>Akcje</DropdownMenuLabel>
-                                            <DropdownMenuItem>Zobacz szczegóły</DropdownMenuItem>
-                                            <DropdownMenuItem>Edytuj</DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuLabel>Status</DropdownMenuLabel>
-                                            {Object.entries(statusLabels).map(([value, label]) => (
-                                                <DropdownMenuItem
-                                                    key={value}
-                                                    onClick={() => handleStatusChange(issue.id, value as Issue['status'])}
-                                                    disabled={issue.status === value}
-                                                >
-                                                    Oznacz jako {label.toLowerCase()}
-                                                </DropdownMenuItem>
-                                            ))}
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuLabel>Priorytet</DropdownMenuLabel>
-                                            {Object.entries(priorityLabels).map(([value, label]) => (
-                                                <DropdownMenuItem
-                                                    key={value}
-                                                    onClick={() => handlePriorityChange(issue.id, value as Issue['priority'])}
-                                                    disabled={issue.priority === value}
-                                                >
-                                                    Ustaw priorytet: {label}
-                                                </DropdownMenuItem>
-                                            ))}
+                                            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(issue.id.toString())}>
+                                                Kopiuj ID
+                                            </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>
@@ -256,6 +276,32 @@ export const IssuesList = () => {
                         ))}
                     </TableBody>
                 </Table>
+            </div>
+
+            <div className="flex items-center justify-between px-2">
+                <div className="text-sm text-muted-foreground">
+                    Strona {currentPage} z {issuesData.totalPages}
+                </div>
+                <div className="flex items-center space-x-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                    >
+                        <ChevronLeft className="h-4 w-4" />
+                        Poprzednia
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === issuesData.totalPages}
+                    >
+                        Następna
+                        <ChevronRight className="h-4 w-4" />
+                    </Button>
+                </div>
             </div>
         </div>
     );

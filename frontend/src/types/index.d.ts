@@ -34,6 +34,19 @@ export type Issue = {
     };
 };
 
+export type PaginatedResponse<T> = {
+    items: T[];
+    total: number;
+    page: number;
+    perPage: number;
+    totalPages: number;
+};
+
+export type PaginationParams = {
+    page?: number;
+    perPage?: number;
+};
+
 export type CreateIssueDto = {
     title: string;
     description: string;
