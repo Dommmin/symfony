@@ -17,9 +17,25 @@ export const useAuth = () => {
             toast.success('Zalogowano pomyślnie');
             navigate('/', { replace: true });
         },
-        onError: (error) => {
+        onError: (error: any) => {
             console.error('Login error:', error);
-            toast.error('Błąd logowania. Sprawdź dane i spróbuj ponownie.');
+            const errorMessage = error.response?.data?.message || 'Nieprawidłowy email lub hasło';
+            
+            // Jeśli to błąd 401, wyczyść stan autoryzacji
+            if (error.response?.status === 401) {
+                setToken(null);
+                setUser(null);
+            }
+            
+            toast.error(errorMessage, {
+                duration: 5000,
+                style: {
+                    background: '#ef4444',
+                    color: '#fff',
+                    padding: '16px',
+                    borderRadius: '8px',
+                },
+            });
         },
     });
 
@@ -29,8 +45,17 @@ export const useAuth = () => {
             toast.success('Konto zostało utworzone. Możesz się teraz zalogować.');
             navigate('/login');
         },
-        onError: () => {
-            toast.error('Błąd rejestracji. Spróbuj ponownie.');
+        onError: (error: any) => {
+            const errorMessage = error.response?.data?.message || 'Błąd rejestracji. Spróbuj ponownie.';
+            toast.error(errorMessage, {
+                duration: 5000,
+                style: {
+                    background: '#ef4444',
+                    color: '#fff',
+                    padding: '16px',
+                    borderRadius: '8px',
+                },
+            });
         },
     });
 

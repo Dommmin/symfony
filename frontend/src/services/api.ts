@@ -35,7 +35,7 @@ api.interceptors.response.use(
         if (error.response?.status === 401) {
             useAuthStore.getState().setToken(null);
             useAuthStore.getState().setUser(null);
-            window.location.href = '/login';
+            // Nie przekierowujemy tutaj - pozwalamy komponentom obsłużyć błąd
         }
         return Promise.reject(error);
     },
