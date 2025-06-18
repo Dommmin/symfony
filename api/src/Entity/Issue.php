@@ -8,6 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use App\Repository\IssueRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: IssueRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -21,28 +22,28 @@ class Issue
     #[Groups(['user:read', 'admin:read'])]
     private ?int $id = null; /** @phpstan-ignore-line */
 
-    #[ORM\Column(enumType: IssueStatus::class)]
+    #[ORM\Column(name: 'status', enumType: IssueStatus::class)]
     #[Groups(['user:read', 'issue:write', 'admin:read'])]
     private IssueStatus $issueStatus = IssueStatus::NEW;
 
-    #[ORM\ManyToOne(targetEntity: Technician::class, inversedBy: 'issues')]
+    #[ORM\Column(length: 255)]
+    #[Groups(['user:read', 'issue:write', 'admin:read'])]
+    #[Assert\NotBlank]
+    private ?string $title = null;
+
+    #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['user:read', 'issue:write', 'admin:read'])]
+    #[Assert\NotBlank]
+    private ?string $description = null;
+
+    #[ORM\ManyToOne(inversedBy: 'assignedIssues')]
     #[Groups(['user:read', 'admin:read'])]
     private ?Technician $technician = null;
 
-    public function __construct(
-        #[ORM\Column(length: 255)]
-        #[Groups(['user:read', 'issue:write', 'admin:read'])]
-        private string $title,
-        #[ORM\Column(type: Types::TEXT)]
-        #[Groups(['user:read', 'issue:write', 'admin:read'])]
-        private string $description,
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'issues')]
-        #[ORM\JoinColumn(nullable: false)]
-        #[Groups(['admin:read'])]
-        private ?User $user
-    )
-    {
-    }
+    #[ORM\ManyToOne(inversedBy: 'issues')]
+    #[Groups(['user:read', 'admin:read'])]
+    #[Assert\NotBlank]
+    private ?User $user = null;
 
     public function getId(): ?int
     {
@@ -54,9 +55,10 @@ class Issue
         return $this->issueStatus;
     }
 
-    public function setStatus(IssueStatus $issueStatus): self
+    public function setStatus(IssueStatus $issueStatus): static
     {
         $this->issueStatus = $issueStatus;
+
         return $this;
     }
 

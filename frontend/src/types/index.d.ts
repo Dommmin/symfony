@@ -16,8 +16,7 @@ export type Issue = {
     id: number;
     title: string;
     description: string;
-    status: 'new' | 'in_progress' | 'resolved' | 'closed';
-    priority: 'low' | 'medium' | 'high' | 'critical';
+    status: 'new' | 'in_progress' | 'done';
     createdAt: string;
     updatedAt: string;
     user: User;

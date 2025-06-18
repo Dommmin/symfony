@@ -8,11 +8,11 @@ import { Badge } from '@/components/ui/badge';
 
 const getStatusColor = (status: string) => {
     switch (status) {
-        case 'NEW':
+        case 'new':
             return 'bg-blue-500';
-        case 'IN_PROGRESS':
+        case 'in_progress':
             return 'bg-yellow-500';
-        case 'DONE':
+        case 'done':
             return 'bg-green-500';
         default:
             return 'bg-gray-500';
@@ -57,9 +57,9 @@ export const UserIssues = () => {
                                         <div className="flex items-center gap-2">
                                             <h3 className="font-medium">{issue.title}</h3>
                                             <Badge className={getStatusColor(issue.status)}>
-                                                {issue.status === 'NEW' && 'Nowe'}
-                                                {issue.status === 'IN_PROGRESS' && 'W trakcie'}
-                                                {issue.status === 'DONE' && 'Zakończone'}
+                                                {issue.status === 'new' && 'Nowe'}
+                                                {issue.status === 'in_progress' && 'W trakcie'}
+                                                {issue.status === 'done' && 'Zakończone'}
                                             </Badge>
                                         </div>
                                         <p className="text-sm text-muted-foreground">{issue.description}</p>

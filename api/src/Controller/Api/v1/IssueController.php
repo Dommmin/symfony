@@ -31,8 +31,7 @@ class IssueController extends AbstractController
     #[Route('', name: 'index', methods: ['GET'])]
     public function index(Request $request, IssueRepository $issueRepository): Response
     {
-        /** @var User $user */
-        $user = $this->getUser();
+        $this->getUser();
 
         $page = max(1, (int)$request->query->get('page', 1));
         $limit = min(50, (int)$request->query->get('limit', 10));

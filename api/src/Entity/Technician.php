@@ -27,6 +27,18 @@ class Technician
     #[Groups(['user:read', 'admin:read'])]
     private ?string $phoneNumber = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:read', 'admin:read'])]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['user:read', 'admin:read'])]
+    private ?string $email = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:read', 'admin:read'])]
+    private ?string $lastName = null;
+
     #[ORM\Column(length: 255)]
     #[Groups(['user:read', 'admin:read'])]
     private string $specialization;
@@ -36,22 +48,6 @@ class Technician
      */
     #[ORM\OneToMany(mappedBy: 'technician', targetEntity: Issue::class)]
     private Collection $issues;
-
-    public function __construct(
-        #[ORM\Column(length: 255)]
-        #[Groups(['user:read', 'admin:read'])]
-        private string $firstName,
-        #[ORM\Column(length: 255)]
-        #[Groups(['user:read', 'admin:read'])]
-        private string $lastName,
-        #[ORM\Column(length: 180)]
-        #[Groups(['admin:read'])]
-        private string $email,
-        string $specialization = 'Specjalista IT'
-    ) {
-        $this->issues = new ArrayCollection();
-        $this->specialization = $specialization;
-    }
 
     public function getId(): ?int
     {

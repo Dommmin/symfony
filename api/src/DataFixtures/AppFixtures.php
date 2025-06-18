@@ -60,8 +60,12 @@ class AppFixtures extends Fixture
         ];
 
         foreach ($technicianData as [$firstName, $lastName, $email, $phone, $specialization]) {
-            $technician = new Technician($firstName, $lastName, $email, $specialization);
+            $technician = new Technician();
             $technician->setPhoneNumber($phone);
+            $technician->setFirstName($firstName);
+            $technician->setLastName($lastName);
+            $technician->setEmail($email);
+            $technician->setSpecialization($specialization);
             $objectManager->persist($technician);
             $technicians[] = $technician;
         }
@@ -187,7 +191,10 @@ class AppFixtures extends Fixture
 
         foreach ($issueData as $index => [$title, $description, $status]) {
             $user = $users[$index % count($users)];
-            $issue = new Issue($title, $description, $user);
+            $issue = new Issue();
+            $issue->setTitle($title);
+            $issue->setDescription($description);
+            $issue->setUser($user);
             $issue->setStatus($status);
 
             // Assign technicians to IN_PROGRESS and DONE issues
