@@ -21,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 const statusColors = {
     new: 'bg-blue-500',
     in_progress: 'bg-yellow-500',
-    resolved: 'bg-green-500',
+    done: 'bg-green-500',
     closed: 'bg-gray-500',
 };
 
@@ -100,8 +100,7 @@ export const IssuesList = () => {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => setStatusFilter('new')}>Nowe</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setStatusFilter('in_progress')}>W trakcie</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setStatusFilter('resolved')}>Rozwiązane</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setStatusFilter('closed')}>Zamknięte</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setStatusFilter('done')}>Rozwiązane</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -150,8 +149,7 @@ export const IssuesList = () => {
                                     <Badge className={`${statusColors[issue.status]} text-white`}>
                                         {issue.status === 'new' && 'Nowe'}
                                         {issue.status === 'in_progress' && 'W trakcie'}
-                                        {issue.status === 'resolved' && 'Rozwiązane'}
-                                        {issue.status === 'closed' && 'Zamknięte'}
+                                        {issue.status === 'done' && 'Rozwiązane'}
                                     </Badge>
                                 </TableCell>
                                 <TableCell>
@@ -183,8 +181,8 @@ export const IssuesList = () => {
                                                 Oznacz jako w trakcie
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
-                                                onClick={() => handleStatusChange(issue.id, 'resolved')}
-                                                disabled={issue.status === 'resolved'}
+                                                onClick={() => handleStatusChange(issue.id, 'done')}
+                                                disabled={issue.status === 'done'}
                                             >
                                                 Oznacz jako rozwiązane
                                             </DropdownMenuItem>

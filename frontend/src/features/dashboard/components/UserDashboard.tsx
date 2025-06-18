@@ -18,9 +18,9 @@ export const UserDashboard = () => {
     }
 
     const userIssues = issues?.filter((issue) => issue.user.id === user?.id) || [];
-    const newIssues = userIssues.filter((issue) => issue.status === 'NEW').length;
-    const inProgressIssues = userIssues.filter((issue) => issue.status === 'IN_PROGRESS').length;
-    const doneIssues = userIssues.filter((issue) => issue.status === 'DONE').length;
+    const newIssues = userIssues.filter((issue) => issue.status === 'new').length;
+    const inProgressIssues = userIssues.filter((issue) => issue.status === 'in_progress').length;
+    const doneIssues = userIssues.filter((issue) => issue.status === 'done').length;
 
     return (
         <div className="space-y-6">

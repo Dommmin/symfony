@@ -26,6 +26,10 @@ class Issue
     #[Groups(['user:read', 'issue:write', 'admin:read'])]
     private IssueStatus $issueStatus = IssueStatus::NEW;
 
+    #[ORM\Column(name: 'priority', enumType: IssuePriority::class)]
+    #[Groups(['user:read', 'issue:write', 'admin:read'])]
+    private IssuePriority $issuePriority = IssuePriority::LOW;
+
     #[ORM\Column(length: 255)]
     #[Groups(['user:read', 'issue:write', 'admin:read'])]
     #[Assert\NotBlank]
@@ -58,6 +62,18 @@ class Issue
     public function setStatus(IssueStatus $issueStatus): static
     {
         $this->issueStatus = $issueStatus;
+
+        return $this;
+    }
+
+    public function getPriority(): IssuePriority
+    {
+        return $this->issuePriority;
+    }
+
+    public function setPriority(IssuePriority $issuePriority): static
+    {
+        $this->issuePriority = $issuePriority;
 
         return $this;
     }

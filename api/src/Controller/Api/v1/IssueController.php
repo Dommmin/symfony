@@ -59,14 +59,18 @@ class IssueController extends AbstractController
 
         $results = iterator_to_array($pagerfanta->getCurrentPageResults());
 
-        $data = array_map(fn($i): array => [
-            'id' => $i->getId(),
-            'title' => $i->getTitle(),
-            'description' => $i->getDescription(),
-            'status' => $i->getStatus()->value,
-            'createdAt' => $i->getCreatedAt()->format(DATE_ATOM),
-            'user' => $i->getUser()->getId(),
-            'technician' => $i->getTechnician()?->getId(),
+        $data = array_map(fn(Issue $issue): array => [
+            'id' => $issue->getId(),
+            'title' => $issue->getTitle(),
+            'description' => $issue->getDescription(),
+            'status' => $issue->getStatus()->value,
+            'priority' => $issue->getPriority()->value,
+            'createdAt' => $issue->getCreatedAt()->format(DATE_ATOM),
+            'user' => [
+                'id' => $issue->getUser()->getId(),
+                'email' => $issue->getUser()->getEmail(),
+            ],
+            'technician' => $issue->getTechnician(),
         ], $results);
 
         return $this->json([
@@ -100,11 +104,15 @@ class IssueController extends AbstractController
             return $this->json(['errors' => (string)$constraintViolationList], Response::HTTP_BAD_REQUEST);
         }
 
-        $issue = new Issue($issueCreateDTO->title, $issueCreateDTO->description, $user);
+        $issue = new Issue();
+        $issue->setTitle($issueCreateDTO->title);
+        $issue->setDescription($issueCreateDTO->description);
+        $issue->setUser($user);
         $issue->setStatus(IssueStatus::NEW);
 
         $entityManager->persist($issue);
         $entityManager->flush();
+
         return $this->json(['id' => $issue->getId()], Response::HTTP_CREATED);
     }
 

@@ -16,11 +16,22 @@ export type Issue = {
     id: number;
     title: string;
     description: string;
-    status: 'new' | 'in_progress' | 'done';
+    status: 'new' | 'in_progress' | 'done' | 'closed';
+    priority: 'low' | 'medium' | 'high' | 'critical';
     createdAt: string;
     updatedAt: string;
-    user: User;
-    technician?: Technician;
+    user: {
+        id: number;
+        email: string;
+    };
+    technician?: {
+        id: number;
+        firstName: string;
+        lastName: string;
+        email: string;
+        phoneNumber?: string;
+        specialization: string;
+    };
 };
 
 export type CreateIssueDto = {
