@@ -27,22 +27,30 @@ class Technician
     #[Groups(['user:read', 'admin:read'])]
     private ?string $phoneNumber = null;
 
+    #[ORM\Column(length: 255)]
+    #[Groups(['user:read', 'admin:read'])]
+    private string $specialization;
+
     /**
      * @var Collection<int, Issue>
      */
     #[ORM\OneToMany(mappedBy: 'technician', targetEntity: Issue::class)]
     private Collection $issues;
 
-    public function __construct(/** @phpstan-ignore-line */
-    #[ORM\Column(length: 255)]
-    #[Groups(['user:read', 'admin:read'])]
-    private string $firstName, #[ORM\Column(length: 255)]
-    #[Groups(['user:read', 'admin:read'])]
-    private string $lastName, #[ORM\Column(length: 180)]
-    #[Groups(['admin:read'])]
-    private string $email)
-    {
+    public function __construct(
+        #[ORM\Column(length: 255)]
+        #[Groups(['user:read', 'admin:read'])]
+        private string $firstName,
+        #[ORM\Column(length: 255)]
+        #[Groups(['user:read', 'admin:read'])]
+        private string $lastName,
+        #[ORM\Column(length: 180)]
+        #[Groups(['admin:read'])]
+        private string $email,
+        string $specialization = 'Specjalista IT'
+    ) {
         $this->issues = new ArrayCollection();
+        $this->specialization = $specialization;
     }
 
     public function getId(): ?int
@@ -91,6 +99,17 @@ class Technician
     public function setPhoneNumber(?string $phoneNumber): self
     {
         $this->phoneNumber = $phoneNumber;
+        return $this;
+    }
+
+    public function getSpecialization(): string
+    {
+        return $this->specialization;
+    }
+
+    public function setSpecialization(string $specialization): self
+    {
+        $this->specialization = $specialization;
         return $this;
     }
 

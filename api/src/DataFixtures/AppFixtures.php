@@ -49,13 +49,18 @@ class AppFixtures extends Fixture
         // Create technicians
         $technicians = [];
         $technicianData = [
-            ['Adam', 'Mechanik', 'adam.mechanik@fixmate.com', '+48 123 456 789'],
-            ['Ewa', 'Elektryczna', 'ewa.elektryczna@fixmate.com', '+48 234 567 890'],
-            ['Piotr', 'Programista', 'piotr.programista@fixmate.com', '+48 345 678 901']
+            ['Adam', 'Kowalski', 'adam.kowalski@fixmate.com', '+48 123 456 789', 'Specjalista IT'],
+            ['Ewa', 'Nowak', 'ewa.nowak@fixmate.com', '+48 234 567 890', 'Administrator Systemów'],
+            ['Piotr', 'Wiśniewski', 'piotr.wisniewski@fixmate.com', '+48 345 678 901', 'Inżynier Sieci'],
+            ['Anna', 'Lewandowska', 'anna.lewandowska@fixmate.com', '+48 456 789 012', 'Specjalista Bezpieczeństwa IT'],
+            ['Marek', 'Dąbrowski', 'marek.dabrowski@fixmate.com', '+48 567 890 123', 'Administrator Baz Danych'],
+            ['Karolina', 'Wójcik', 'karolina.wojcik@fixmate.com', '+48 678 901 234', 'Specjalista Helpdesk'],
+            ['Tomasz', 'Kamiński', 'tomasz.kaminski@fixmate.com', '+48 789 012 345', 'Inżynier Systemowy'],
+            ['Magdalena', 'Zielińska', 'magdalena.zielinska@fixmate.com', '+48 890 123 456', 'Specjalista Infrastruktury IT']
         ];
 
-        foreach ($technicianData as [$firstName, $lastName, $email, $phone]) {
-            $technician = new Technician($firstName, $lastName, $email);
+        foreach ($technicianData as [$firstName, $lastName, $email, $phone, $specialization]) {
+            $technician = new Technician($firstName, $lastName, $email, $specialization);
             $technician->setPhoneNumber($phone);
             $objectManager->persist($technician);
             $technicians[] = $technician;
