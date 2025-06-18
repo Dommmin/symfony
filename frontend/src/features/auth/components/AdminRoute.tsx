@@ -1,17 +1,17 @@
-import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '@/features/auth/stores/authStore';
+import { Navigate, Outlet } from 'react-router-dom';
 
 export const AdminRoute = () => {
-  const isAdmin = useAuthStore((state) => state.isAdmin);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    const isAdmin = useAuthStore((state) => state.isAdmin);
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />;
+    }
 
-  if (!isAdmin) {
-    return <Navigate to="/" replace />;
-  }
+    if (!isAdmin) {
+        return <Navigate to="/" replace />;
+    }
 
-  return <Outlet />;
-}; 
+    return <Outlet />;
+};
