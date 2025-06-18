@@ -11,6 +11,9 @@ import './index.css';
 import { AdminLayout } from './layouts/AdminLayout';
 import { UserLayout } from './layouts/UserLayout';
 import { NotFound } from './pages/NotFound';
+import { UserDashboard } from './features/dashboard/components/UserDashboard';
+import { UserIssues } from './features/issues/components/UserIssues';
+import { NewIssue } from './features/issues/components/NewIssue';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -49,19 +52,19 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: '/',
-                        element: <div>User Dashboard</div>,
+                        element: <UserDashboard />,
                     },
                     {
                         path: 'dashboard',
-                        element: <div>User Dashboard</div>,
+                        element: <UserDashboard />,
                     },
                     {
                         path: 'issues',
-                        element: <div>User Issues</div>,
+                        element: <UserIssues />,
                     },
                     {
                         path: 'issues/new',
-                        element: <div>New Issue</div>,
+                        element: <NewIssue />,
                     },
                 ],
             },
