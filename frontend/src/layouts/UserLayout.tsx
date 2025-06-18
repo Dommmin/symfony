@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { Bell, FileText, Home, LogOut, Menu, PlusCircle } from 'lucide-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
@@ -28,6 +28,10 @@ export const UserLayout = () => {
                         </Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="w-[300px] p-0">
+                        <SheetTitle className="sr-only">Menu nawigacyjne</SheetTitle>
+                        <SheetDescription className="sr-only">
+                            Menu nawigacyjne aplikacji FixMate zawierające dostęp do zgłoszeń i ustawień
+                        </SheetDescription>
                         <div className="flex h-full flex-col">
                             <div className="p-6">
                                 <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-2xl font-bold text-transparent">
@@ -51,6 +55,12 @@ export const UserLayout = () => {
                             </nav>
                             <Separator />
                             <div className="p-4">
+                                <Link to="/admin">
+                                    <Button variant="outline" className="w-full justify-start space-x-3">
+                                        <Home className="h-5 w-5" />
+                                        <span>Panel administracyjny</span>
+                                    </Button>
+                                </Link>
                                 <Button
                                     variant="ghost"
                                     className="w-full justify-start space-x-3 text-red-600 hover:bg-red-50 hover:text-red-700"
@@ -91,6 +101,12 @@ export const UserLayout = () => {
                         </nav>
                         <Separator />
                         <div className="p-4">
+                            <Link to="/admin">
+                                <Button variant="outline" className="w-full justify-start space-x-3">
+                                    <Home className="h-5 w-5" />
+                                    <span>Panel administracyjny</span>
+                                </Button>
+                            </Link>
                             <Button
                                 variant="ghost"
                                 className="w-full justify-start space-x-3 text-red-600 hover:bg-red-50 hover:text-red-700"

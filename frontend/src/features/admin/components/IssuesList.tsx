@@ -39,7 +39,7 @@ export const IssuesList = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
 
-    const { data: issues = [], isLoading } = useQuery({
+    const { data: issues, isLoading } = useQuery({
         queryKey: ['issues'],
         queryFn: issuesApi.getIssues,
     });
@@ -55,7 +55,7 @@ export const IssuesList = () => {
         },
     });
 
-    const filteredIssues = issues.filter((issue) => {
+    const filteredIssues = (issues || []).filter((issue) => {
         const matchesSearch =
             issue.title.toLowerCase().includes(searchQuery.toLowerCase()) || issue.description.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesStatus = statusFilter === 'all' || issue.status === statusFilter;
@@ -69,6 +69,10 @@ export const IssuesList = () => {
 
     if (isLoading) {
         return <div>Ładowanie...</div>;
+    }
+
+    if (!issues) {
+        return <div>Brak zgłoszeń</div>;
     }
 
     return (

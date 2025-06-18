@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, AlertCircle, CheckCircle2, Clock, Users } from 'lucide-react';
 
-export const AdminDashboard = () => {
+export default function AdminDashboardPage() {
     const stats = {
         totalIssues: 156,
         activeIssues: 42,
@@ -137,4 +137,4 @@ export const AdminDashboard = () => {
             </Card>
         </div>
     );
-};
+} 

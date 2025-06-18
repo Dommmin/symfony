@@ -2,16 +2,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { Bell, FileText, Home, LogOut, Menu, Settings, Shield, Users } from 'lucide-react';
+import { Bell, FileText, Home, LogOut, Menu, Shield, Users } from 'lucide-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 const navigation = [
     { name: 'Dashboard', href: '/admin', icon: Home },
     { name: 'Zgłoszenia', href: '/admin/issues', icon: FileText },
     { name: 'Technicy', href: '/admin/technicians', icon: Users },
-    { name: 'Ustawienia', href: '/admin/settings', icon: Settings },
 ];
 
 export const AdminLayout = () => {
@@ -29,6 +28,7 @@ export const AdminLayout = () => {
                         </Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="w-[300px] p-0">
+                        <SheetTitle className="sr-only">Menu nawigacyjne</SheetTitle>
                         <div className="flex h-full flex-col">
                             <div className="p-6">
                                 <div className="flex items-center space-x-2">
@@ -37,6 +37,9 @@ export const AdminLayout = () => {
                                         FixMate Admin
                                     </span>
                                 </div>
+                                <SheetDescription className="mt-2 text-sm text-gray-500">
+                                    Panel administracyjny aplikacji FixMate
+                                </SheetDescription>
                             </div>
                             <Separator />
                             <nav className="flex-1 space-y-2 p-4">

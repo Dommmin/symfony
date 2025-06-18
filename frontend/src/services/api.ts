@@ -60,8 +60,8 @@ export const authApi = {
 
 export const issuesApi = {
     getIssues: async (): Promise<Issue[]> => {
-        const response = await api.get<Issue[]>('/issues');
-        return response.data;
+        const response = await api.get<{ items: Issue[] }>('/issues');
+        return response.data.items;
     },
 
     getIssue: async (id: number): Promise<Issue> => {

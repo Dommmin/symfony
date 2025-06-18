@@ -3,15 +3,10 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { AdminDashboard } from './features/admin/components/AdminDashboard';
-import { CreateIssueForm } from './features/admin/components/CreateIssueForm';
-import { IssuesList } from './features/admin/components/IssuesList';
 import { AdminRoute } from './features/auth/components/AdminRoute';
 import { AuthProvider } from './features/auth/components/AuthProvider';
 import { PrivateRoute } from './features/auth/components/PrivateRoute';
 import { PublicRoute } from './features/auth/components/PublicRoute';
-import { LoginView } from './features/auth/views/LoginView';
-import { RegisterView } from './features/auth/views/RegisterView';
 import './index.css';
 import { AdminLayout } from './layouts/AdminLayout';
 import { UserLayout } from './layouts/UserLayout';
@@ -32,11 +27,17 @@ const router = createBrowserRouter([
         children: [
             {
                 path: 'login',
-                element: <LoginView />,
+                async lazy() {
+                    const { default: Component } = await import('./pages/auth/login');
+                    return { Component };
+                },
             },
             {
                 path: 'register',
-                element: <RegisterView />,
+                async lazy() {
+                    const { default: Component } = await import('./pages/auth/register');
+                    return { Component };
+                },
             },
         ],
     },
@@ -75,15 +76,24 @@ const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
-                        element: <AdminDashboard />,
+                        async lazy() {
+                            const { default: Component } = await import('./pages/admin/dashboard');
+                            return { Component };
+                        },
                     },
                     {
                         path: 'issues',
-                        element: <IssuesList />,
+                        async lazy() {
+                            const { default: Component } = await import('./pages/admin/issues');
+                            return { Component };
+                        },
                     },
                     {
                         path: 'issues/new',
-                        element: <CreateIssueForm />,
+                        async lazy() {
+                            const { default: Component } = await import('./pages/admin/issues/new');
+                            return { Component };
+                        },
                     },
                     {
                         path: 'technicians',
