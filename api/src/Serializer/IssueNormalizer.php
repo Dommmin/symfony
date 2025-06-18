@@ -11,14 +11,16 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class IssueNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
-    private ?SerializerInterface $serializer = null;
-
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')]
         private readonly ObjectNormalizer $normalizer,
     ) {
     }
 
+    /**
+     * @param array<string, mixed> $context
+     * @return array<string, mixed>|string|int|float|bool|\ArrayObject|null
+     */
     public function normalize(
         mixed $data,
         ?string $format = null,
@@ -26,11 +28,14 @@ class IssueNormalizer implements NormalizerInterface, SerializerAwareInterface
     ): array|string|int|float|bool|\ArrayObject|null {
         $normalizedData = $this->normalizer->normalize($data, $format, $context);
         if ($data instanceof Issue && is_array($normalizedData)) {
-            $normalizedData['status_label'] = $data->getStatus()?->name ?? null;
+            $normalizedData['status_label'] = $data->getStatus()->name;
         }
         return $normalizedData;
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function supportsNormalization(
         mixed $data,
         ?string $format = null,
@@ -39,6 +44,9 @@ class IssueNormalizer implements NormalizerInterface, SerializerAwareInterface
         return $data instanceof Issue;
     }
 
+    /**
+     * @return array<class-string, bool>
+     */
     public function getSupportedTypes(?string $format): array
     {
         return [
@@ -48,9 +56,6 @@ class IssueNormalizer implements NormalizerInterface, SerializerAwareInterface
 
     public function setSerializer(SerializerInterface $serializer): void
     {
-        $this->serializer = $serializer;
-        if ($this->normalizer instanceof SerializerAwareInterface) {
-            $this->normalizer->setSerializer($serializer);
-        }
+        $this->normalizer->setSerializer($serializer);
     }
 }

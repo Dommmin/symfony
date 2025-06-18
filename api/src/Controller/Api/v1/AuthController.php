@@ -35,6 +35,9 @@ class AuthController extends AbstractController
     }
 
     #[Route('/login', name: 'login', methods: ['POST'])]
+    /**
+     * @param UserProviderInterface<User> $userProvider
+     */
     public function login(Request $request, UserProviderInterface $userProvider, UserPasswordHasherInterface $passwordHasher, JWTTokenManagerInterface $jwtManager): Response
     {
         $data = json_decode($request->getContent(), true);
@@ -48,7 +51,7 @@ class AuthController extends AbstractController
             return new JsonResponse(['error' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
         }
 
-        if (!$user || !$user instanceof User || !$passwordHasher->isPasswordValid($user, $data['password'])) {
+        if (!($user instanceof User) || !$passwordHasher->isPasswordValid($user, $data['password'])) {
             return new JsonResponse(['error' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
         }
 

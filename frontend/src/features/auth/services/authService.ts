@@ -17,8 +17,6 @@ export const authService = {
 
     async register(credentials: RegisterDto) {
         const data = await authApi.register({
-            firstName: credentials.firstName,
-            lastName: credentials.lastName,
             email: credentials.email,
             password: credentials.password,
         });

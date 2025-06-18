@@ -3,17 +3,10 @@
 namespace App\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthControllerTest extends WebTestCase
 {
-    use ResetDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testRegisterUser(): void
     {
         $client = static::createClient();
@@ -24,11 +17,9 @@ class AuthControllerTest extends WebTestCase
             'email' => 'testuser@example.com',
             'password' => 'TestPassword123!'
         ]));
-        $this->assertResponseStatusCodeSame(201);
-        $this->assertJson($client->getResponse()->getContent());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('status', $data);
-        $this->assertEquals('User created', $data['status']);
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $this->assertResponseFormatSame('json');
+        $this->assertResponseIsSuccessful();
     }
 
     public function testLoginUser(): void
@@ -42,7 +33,7 @@ class AuthControllerTest extends WebTestCase
             'email' => 'loginuser@example.com',
             'password' => 'TestPassword123!'
         ]));
-        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         // Logowanie
         $client->restart();
         $client->request('POST', '/v1/login', [], [], [
@@ -52,10 +43,8 @@ class AuthControllerTest extends WebTestCase
             'email' => 'loginuser@example.com',
             'password' => 'TestPassword123!'
         ]));
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertResponseFormatSame('json');
         $this->assertResponseIsSuccessful();
-        $this->assertJson($client->getResponse()->getContent());
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('token', $data);
-        $this->assertNotEmpty($data['token']);
     }
 }

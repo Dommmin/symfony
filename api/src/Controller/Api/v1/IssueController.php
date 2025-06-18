@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Messenger\MessageBusInterface;
 use App\Message\EmailNotificationMessage;
+use App\Entity\User;
 
 #[Route('/issues', name: 'issues_')]
 class IssueController extends AbstractController
@@ -54,6 +55,11 @@ class IssueController extends AbstractController
     #[Route('', name: 'create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return $this->json(['error' => 'Invalid user'], Response::HTTP_UNAUTHORIZED);
+        }
+
         $data = json_decode($request->getContent(), true);
         $dto = new IssueCreateDTO();
         $dto->title = $data['title'] ?? '';
@@ -62,7 +68,7 @@ class IssueController extends AbstractController
         if (count($errors) > 0) {
             return $this->json(['errors' => (string)$errors], Response::HTTP_BAD_REQUEST);
         }
-        $issue = new Issue($dto->title, $dto->description, $this->getUser());
+        $issue = new Issue($dto->title, $dto->description, $user);
         $issue->setStatus(IssueStatus::NEW);
         $em->persist($issue);
         $em->flush();

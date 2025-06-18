@@ -1,8 +1,6 @@
 export type User = {
     id: number;
     email: string;
-    firstName: string;
-    lastName: string;
     roles: string[];
 };
 
@@ -45,8 +43,6 @@ export type LoginDto = {
 export type RegisterDto = {
     email: string;
     password: string;
-    firstName: string;
-    lastName: string;
 };
 
 export type AuthResponse = {
