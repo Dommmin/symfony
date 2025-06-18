@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\IssueRepository;
@@ -20,31 +22,25 @@ class Issue
 
     #[ORM\Column(enumType: IssueStatus::class)]
     #[Groups(['user:read', 'issue:write', 'admin:read'])]
-    private IssueStatus $status;
-
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'issues')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['admin:read'])]
-    private ?User $user = null;
+    private IssueStatus $issueStatus = IssueStatus::NEW;
 
     #[ORM\ManyToOne(targetEntity: Technician::class, inversedBy: 'issues')]
     #[Groups(['user:read', 'admin:read'])]
     private ?Technician $technician = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['user:read', 'issue:write', 'admin:read'])]
-    private string $title;
-
-    #[ORM\Column(type: 'text')]
-    #[Groups(['user:read', 'issue:write', 'admin:read'])]
-    private string $description;
-
-    public function __construct(string $title, string $description, User $user)
+    public function __construct(
+        #[ORM\Column(length: 255)]
+        #[Groups(['user:read', 'issue:write', 'admin:read'])]
+        private string $title,
+        #[ORM\Column(type: \Doctrine\DBAL\Types\Types::TEXT)]
+        #[Groups(['user:read', 'issue:write', 'admin:read'])]
+        private string $description,
+        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'issues')]
+        #[ORM\JoinColumn(nullable: false)]
+        #[Groups(['admin:read'])]
+        private ?User $user
+    )
     {
-        $this->title = $title;
-        $this->description = $description;
-        $this->user = $user;
-        $this->status = IssueStatus::NEW;
     }
 
     public function getId(): ?int
@@ -54,12 +50,12 @@ class Issue
 
     public function getStatus(): IssueStatus
     {
-        return $this->status;
+        return $this->issueStatus;
     }
 
-    public function setStatus(IssueStatus $status): self
+    public function setStatus(IssueStatus $issueStatus): self
     {
-        $this->status = $status;
+        $this->issueStatus = $issueStatus;
         return $this;
     }
 

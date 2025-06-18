@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Api\v1;
 
 use App\Entity\User;
@@ -16,7 +18,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 class AuthController extends AbstractController
 {
     #[Route('/register', name: 'register', methods: ['POST'])]
-    public function register(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
+    public function register(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $userPasswordHasher): Response
     {
         $data = json_decode($request->getContent(), true);
         if (!isset($data['email'], $data['password'])) {
@@ -25,11 +27,11 @@ class AuthController extends AbstractController
 
         $user = new User();
         $user->setEmail($data['email']);
-        $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
+        $user->setPassword($userPasswordHasher->hashPassword($user, $data['password']));
         $user->setRoles(['ROLE_USER']);
 
-        $em->persist($user);
-        $em->flush();
+        $entityManager->persist($user);
+        $entityManager->flush();
 
         return new JsonResponse(['status' => 'User created'], Response::HTTP_CREATED);
     }
@@ -38,7 +40,7 @@ class AuthController extends AbstractController
     /**
      * @param UserProviderInterface<User> $userProvider
      */
-    public function login(Request $request, UserProviderInterface $userProvider, UserPasswordHasherInterface $passwordHasher, JWTTokenManagerInterface $jwtManager): Response
+    public function login(Request $request, UserProviderInterface $userProvider, UserPasswordHasherInterface $userPasswordHasher, JWTTokenManagerInterface $jwtTokenManager): Response
     {
         $data = json_decode($request->getContent(), true);
         if (!isset($data['email'], $data['password'])) {
@@ -47,15 +49,15 @@ class AuthController extends AbstractController
 
         try {
             $user = $userProvider->loadUserByIdentifier($data['email']);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return new JsonResponse(['error' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
         }
 
-        if (!($user instanceof User) || !$passwordHasher->isPasswordValid($user, $data['password'])) {
+        if (!($user instanceof User) || !$userPasswordHasher->isPasswordValid($user, $data['password'])) {
             return new JsonResponse(['error' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $token = $jwtManager->create($user);
+        $token = $jwtTokenManager->create($user);
 
         return new JsonResponse([
             'token' => $token,
@@ -72,4 +74,4 @@ class AuthController extends AbstractController
     {
         return new Response(null, Response::HTTP_NO_CONTENT);
     }
-} 
+}

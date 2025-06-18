@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\EventSubscriber;
 
 use App\Entity\User;
@@ -15,10 +17,10 @@ class JWTAuthenticationSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onAuthenticationSuccess(AuthenticationSuccessEvent $event): void
+    public function onAuthenticationSuccess(AuthenticationSuccessEvent $authenticationSuccessEvent): void
     {
-        $data = $event->getData();
-        $user = $event->getUser();
+        $data = $authenticationSuccessEvent->getData();
+        $user = $authenticationSuccessEvent->getUser();
 
         if (!$user instanceof User) {
             return;
@@ -30,6 +32,6 @@ class JWTAuthenticationSubscriber implements EventSubscriberInterface
             'roles' => $user->getRoles(),
         ];
 
-        $event->setData($data);
+        $authenticationSuccessEvent->setData($data);
     }
-} 
+}

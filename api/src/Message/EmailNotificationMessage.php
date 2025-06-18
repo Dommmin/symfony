@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Message;
 
 class EmailNotificationMessage
@@ -25,4 +27,4 @@ class EmailNotificationMessage
     {
         return $this->content;
     }
-} 
+}

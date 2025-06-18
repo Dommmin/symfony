@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Issue;
@@ -11,9 +13,9 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class IssueRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, Issue::class);
+        parent::__construct($managerRegistry, Issue::class);
     }
 
     //    /**

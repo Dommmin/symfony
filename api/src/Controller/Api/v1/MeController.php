@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Api\v1;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,7 +15,7 @@ class MeController extends AbstractController
     #[Route('/v1/me', name: 'api_v1_me', methods: ['GET'])]
     public function me(#[CurrentUser] ?User $user): JsonResponse
     {
-        if (!$user) {
+        if (!$user instanceof \App\Entity\User) {
             throw $this->createAccessDeniedException('Not authenticated');
         }
 
@@ -23,4 +25,4 @@ class MeController extends AbstractController
             'roles' => $user->getRoles(),
         ]);
     }
-} 
+}

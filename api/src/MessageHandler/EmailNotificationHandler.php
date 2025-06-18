@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\MessageHandler;
 
 use App\Message\EmailNotificationMessage;
@@ -14,20 +16,20 @@ class EmailNotificationHandler
 {
     public function __construct(
         private readonly MailerInterface $mailer,
-        private LoggerInterface $logger
+        private readonly LoggerInterface $logger
     ) {}
 
-    public function __invoke(EmailNotificationMessage $message): void
+    public function __invoke(EmailNotificationMessage $emailNotificationMessage): void
     {
         $email = (new Email())
-            ->to($message->getRecipient())
-            ->subject($message->getSubject())
-            ->text($message->getContent());
+            ->to($emailNotificationMessage->getRecipient())
+            ->subject($emailNotificationMessage->getSubject())
+            ->text($emailNotificationMessage->getContent());
         try {
             $this->mailer->send($email);
-            $this->logger->info('Email sent', ['to' => $message->getRecipient(), 'subject' => $message->getSubject()]);
-        } catch (TransportExceptionInterface $e) {
-            $this->logger->error('Email send failed', ['error' => $e->getMessage()]);
+            $this->logger->info('Email sent', ['to' => $emailNotificationMessage->getRecipient(), 'subject' => $emailNotificationMessage->getSubject()]);
+        } catch (TransportExceptionInterface $transportException) {
+            $this->logger->error('Email send failed', ['error' => $transportException->getMessage()]);
         }
     }
-} 
+}

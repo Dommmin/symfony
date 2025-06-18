@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DataFixtures;
 
 use App\Entity\Issue;
@@ -13,18 +15,19 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class AppFixtures extends Fixture
 {
     public function __construct(
-        private UserPasswordHasherInterface $passwordHasher
+        private readonly UserPasswordHasherInterface $userPasswordHasher
     ) {
     }
 
-    public function load(ObjectManager $manager): void
+    public function load(ObjectManager $objectManager): void
     {
         // Create admin user
         $adminUser = new User();
         $adminUser->setEmail('admin@fixmate.com');
         $adminUser->setRoles(['ROLE_ADMIN']);
-        $adminUser->setPassword($this->passwordHasher->hashPassword($adminUser, 'admin123'));
-        $manager->persist($adminUser);
+        $adminUser->setPassword($this->userPasswordHasher->hashPassword($adminUser, 'admin123'));
+
+        $objectManager->persist($adminUser);
 
         // Create regular users
         $users = [];
@@ -38,8 +41,8 @@ class AppFixtures extends Fixture
         foreach ($userEmails as $email) {
             $user = new User();
             $user->setEmail($email);
-            $user->setPassword($this->passwordHasher->hashPassword($user, 'password123'));
-            $manager->persist($user);
+            $user->setPassword($this->userPasswordHasher->hashPassword($user, 'password123'));
+            $objectManager->persist($user);
             $users[] = $user;
         }
 
@@ -54,7 +57,7 @@ class AppFixtures extends Fixture
         foreach ($technicianData as [$firstName, $lastName, $email, $phone]) {
             $technician = new Technician($firstName, $lastName, $email);
             $technician->setPhoneNumber($phone);
-            $manager->persist($technician);
+            $objectManager->persist($technician);
             $technicians[] = $technician;
         }
 
@@ -101,15 +104,15 @@ class AppFixtures extends Fixture
             $user = $users[$index % count($users)];
             $issue = new Issue($title, $description, $user);
             $issue->setStatus($status);
-            
+
             // Assign technicians to IN_PROGRESS and DONE issues
             if ($status !== IssueStatus::NEW) {
                 $issue->setTechnician($technicians[$index % count($technicians)]);
             }
-            
-            $manager->persist($issue);
+
+            $objectManager->persist($issue);
         }
 
-        $manager->flush();
+        $objectManager->flush();
     }
 }

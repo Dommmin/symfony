@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Api\v1;
 
 use App\DTO\IssueCreateDTO;
@@ -25,22 +27,22 @@ use App\Entity\User;
 class IssueController extends AbstractController
 {
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(Request $request, IssueRepository $repo): Response
+    public function index(Request $request, IssueRepository $issueRepository): Response
     {
+        /** @var User $user */
         $user = $this->getUser();
+
         $page = max(1, (int)$request->query->get('page', 1));
         $limit = min(50, (int)$request->query->get('limit', 10));
         $criteria = [];
-        if ($request->query->get('user')) {
-            $criteria['user'] = $request->query->get('user');
-        } else {
-            $criteria['user'] = $user;
-        }
+        $criteria['user'] = $request->query->get('user') ?: $user;
+
         if ($request->query->get('status')) {
             $criteria['status'] = $request->query->get('status');
         }
-        $issues = $repo->findBy($criteria, ['id' => 'DESC'], $limit, ($page-1)*$limit);
-        $data = array_map(fn($i) => [
+
+        $issues = $issueRepository->findBy($criteria, ['id' => 'DESC'], $limit, ($page-1)*$limit);
+        $data = array_map(fn($i): array => [
             'id' => $i->getId(),
             'title' => $i->getTitle(),
             'description' => $i->getDescription(),
@@ -49,11 +51,12 @@ class IssueController extends AbstractController
             'user' => $i->getUser()->getId(),
             'technician' => $i->getTechnician()?->getId(),
         ], $issues);
+
         return $this->json(['items' => $data, 'page' => $page, 'limit' => $limit]);
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): Response
+    public function create(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): Response
     {
         $user = $this->getUser();
         if (!$user instanceof User) {
@@ -61,55 +64,65 @@ class IssueController extends AbstractController
         }
 
         $data = json_decode($request->getContent(), true);
-        $dto = new IssueCreateDTO();
-        $dto->title = $data['title'] ?? '';
-        $dto->description = $data['description'] ?? '';
-        $errors = $validator->validate($dto);
-        if (count($errors) > 0) {
-            return $this->json(['errors' => (string)$errors], Response::HTTP_BAD_REQUEST);
+        $issueCreateDTO = new IssueCreateDTO();
+        $issueCreateDTO->title = $data['title'] ?? '';
+        $issueCreateDTO->description = $data['description'] ?? '';
+
+        $constraintViolationList = $validator->validate($issueCreateDTO);
+        if (count($constraintViolationList) > 0) {
+            return $this->json(['errors' => (string)$constraintViolationList], Response::HTTP_BAD_REQUEST);
         }
-        $issue = new Issue($dto->title, $dto->description, $user);
+
+        $issue = new Issue($issueCreateDTO->title, $issueCreateDTO->description, $user);
         $issue->setStatus(IssueStatus::NEW);
-        $em->persist($issue);
-        $em->flush();
+
+        $entityManager->persist($issue);
+        $entityManager->flush();
         return $this->json(['id' => $issue->getId()], Response::HTTP_CREATED);
     }
 
     #[Route('/{id}', name: 'update', methods: ['PATCH'])]
     #[IsGranted('ROLE_USER')]
-    public function update(int $id, Request $request, EntityManagerInterface $em, IssueRepository $repo, TechnicianRepository $techRepo, ValidatorInterface $validator, MessageBusInterface $bus): Response
+    public function update(int $id, Request $request, EntityManagerInterface $entityManager, IssueRepository $issueRepository, TechnicianRepository $technicianRepository, ValidatorInterface $validator, MessageBusInterface $messageBus): Response
     {
-        $issue = $repo->find($id);
-        if (!$issue) {
+        $issue = $issueRepository->find($id);
+        if ($issue === null) {
             return $this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND);
         }
+
         if ($issue->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
             return $this->json(['error' => 'Forbidden'], Response::HTTP_FORBIDDEN);
         }
+
         $data = json_decode($request->getContent(), true);
-        $dto = new IssueUpdateDTO();
-        $dto->status = $data['status'] ?? null;
-        $dto->technicianId = $data['technicianId'] ?? null;
-        $errors = $validator->validate($dto);
-        if (count($errors) > 0) {
-            return $this->json(['errors' => (string)$errors], Response::HTTP_BAD_REQUEST);
+        $issueUpdateDTO = new IssueUpdateDTO();
+        $issueUpdateDTO->status = $data['status'] ?? null;
+        $issueUpdateDTO->technicianId = $data['technicianId'] ?? null;
+
+        $constraintViolationList = $validator->validate($issueUpdateDTO);
+        if (count($constraintViolationList) > 0) {
+            return $this->json(['errors' => (string)$constraintViolationList], Response::HTTP_BAD_REQUEST);
         }
-        if ($dto->status) {
-            $issue->setStatus(IssueStatus::from($dto->status));
-            $bus->dispatch(new EmailNotificationMessage(
+
+        if ($issueUpdateDTO->status) {
+            $issue->setStatus(IssueStatus::from($issueUpdateDTO->status));
+            $messageBus->dispatch(new EmailNotificationMessage(
                 $issue->getUser()->getEmail(),
                 'Zmiana statusu zgłoszenia',
                 sprintf('Status Twojego zgłoszenia #%d został zmieniony na: %s', $issue->getId(), $issue->getStatus()->value)
             ));
         }
-        if ($dto->technicianId) {
-            $technician = $techRepo->find($dto->technicianId);
-            if (!$technician) {
+
+        if ($issueUpdateDTO->technicianId) {
+            $technician = $technicianRepository->find($issueUpdateDTO->technicianId);
+            if ($technician === null) {
                 return $this->json(['error' => 'Technician not found'], Response::HTTP_BAD_REQUEST);
             }
+
             $issue->setTechnician($technician);
         }
-        $em->flush();
+
+        $entityManager->flush();
         return $this->json(['status' => 'updated']);
     }
-} 
+}

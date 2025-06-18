@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Serializer;
 
 use App\Entity\Issue;
@@ -13,7 +15,7 @@ class IssueNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')]
-        private readonly ObjectNormalizer $normalizer,
+        private readonly ObjectNormalizer $objectNormalizer,
     ) {
     }
 
@@ -26,10 +28,11 @@ class IssueNormalizer implements NormalizerInterface, SerializerAwareInterface
         ?string $format = null,
         array $context = []
     ): array|string|int|float|bool|\ArrayObject|null {
-        $normalizedData = $this->normalizer->normalize($data, $format, $context);
+        $normalizedData = $this->objectNormalizer->normalize($data, $format, $context);
         if ($data instanceof Issue && is_array($normalizedData)) {
             $normalizedData['status_label'] = $data->getStatus()->name;
         }
+
         return $normalizedData;
     }
 
@@ -56,6 +59,6 @@ class IssueNormalizer implements NormalizerInterface, SerializerAwareInterface
 
     public function setSerializer(SerializerInterface $serializer): void
     {
-        $this->normalizer->setSerializer($serializer);
+        $this->objectNormalizer->setSerializer($serializer);
     }
 }

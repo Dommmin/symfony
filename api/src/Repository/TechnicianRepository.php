@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Technician;
@@ -11,9 +13,9 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TechnicianRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, Technician::class);
+        parent::__construct($managerRegistry, Technician::class);
     }
 
     //    /**

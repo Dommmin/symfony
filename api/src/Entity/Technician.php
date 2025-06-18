@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\TechnicianRepository;
@@ -19,19 +21,7 @@ class Technician
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(['user:read', 'admin:read'])]
-    private ?int $id = null; /** @phpstan-ignore-line */
-
-    #[ORM\Column(length: 255)]
-    #[Groups(['user:read', 'admin:read'])]
-    private string $firstName;
-
-    #[ORM\Column(length: 255)]
-    #[Groups(['user:read', 'admin:read'])]
-    private string $lastName;
-
-    #[ORM\Column(length: 180)]
-    #[Groups(['admin:read'])]
-    private string $email;
+    private ?int $id = null;
 
     #[ORM\Column(length: 20, nullable: true)]
     #[Groups(['user:read', 'admin:read'])]
@@ -43,11 +33,15 @@ class Technician
     #[ORM\OneToMany(mappedBy: 'technician', targetEntity: Issue::class)]
     private Collection $issues;
 
-    public function __construct(string $firstName, string $lastName, string $email)
+    public function __construct(/** @phpstan-ignore-line */
+    #[ORM\Column(length: 255)]
+    #[Groups(['user:read', 'admin:read'])]
+    private string $firstName, #[ORM\Column(length: 255)]
+    #[Groups(['user:read', 'admin:read'])]
+    private string $lastName, #[ORM\Column(length: 180)]
+    #[Groups(['admin:read'])]
+    private string $email)
     {
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
-        $this->email = $email;
         $this->issues = new ArrayCollection();
     }
 
