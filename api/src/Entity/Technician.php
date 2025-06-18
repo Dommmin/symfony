@@ -7,6 +7,7 @@ namespace App\Entity;
 use App\Repository\TechnicianRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TechnicianRepository::class)]
@@ -21,21 +22,21 @@ class Technician
     #[Groups(['user:read', 'admin:read'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
+    #[ORM\Column(length: 255)]
     #[Groups(['user:read', 'admin:read'])]
-    private ?string $phoneNumber = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:read', 'admin:read'])]
-    private ?string $firstName = null;
+    private string $firstName;
 
     #[ORM\Column(length: 255)]
     #[Groups(['user:read', 'admin:read'])]
-    private ?string $email = null;
+    private string $lastName;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
     #[Groups(['user:read', 'admin:read'])]
-    private ?string $lastName = null;
+    private string $email;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    #[Groups(['user:read', 'admin:read'])]
+    private ?string $phoneNumber = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['user:read', 'admin:read'])]
@@ -46,6 +47,11 @@ class Technician
      */
     #[ORM\OneToMany(mappedBy: 'technician', targetEntity: Issue::class)]
     private Collection $issues;
+
+    public function __construct()
+    {
+        $this->issues = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {

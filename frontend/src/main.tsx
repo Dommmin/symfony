@@ -100,7 +100,10 @@ const router = createBrowserRouter([
                     },
                     {
                         path: 'technicians',
-                        element: <div>Technicians</div>,
+                        async lazy() {
+                            const { default: Component } = await import('./pages/admin/technicians');
+                            return { Component };
+                        },
                     },
                 ],
             },

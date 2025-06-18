@@ -42,7 +42,7 @@ export type CreateIssueDto = {
 
 export type UpdateIssueDto = Partial<CreateIssueDto> & {
     status?: Issue['status'];
-    technicianId?: number;
+    technicianId?: number | null;
 };
 
 export type LoginDto = {
@@ -59,3 +59,12 @@ export type AuthResponse = {
     token: string;
     user: User;
 };
+
+export type CreateTechnicianDto = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    specialization: string;
+};
+
+export type UpdateTechnicianDto = Partial<CreateTechnicianDto>;

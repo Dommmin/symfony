@@ -7,9 +7,10 @@ namespace App\Message;
 class EmailNotificationMessage
 {
     public function __construct(
-        private readonly string $recipient,
-        private readonly string $subject,
-        private readonly string $content
+        public readonly string $recipient,
+        public readonly string $subject,
+        public readonly string $template,
+        public readonly array $context = [],
     ) {
     }
 
@@ -23,8 +24,13 @@ class EmailNotificationMessage
         return $this->subject;
     }
 
-    public function getContent(): string
+    public function getTemplate(): string
     {
-        return $this->content;
+        return $this->template;
+    }
+
+    public function getContext(): array
+    {
+        return $this->context;
     }
 }

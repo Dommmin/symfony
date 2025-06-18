@@ -8,15 +8,24 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { issuesApi } from '@/services/api';
-import type { Issue, UpdateIssueDto } from '@/types';
+import { issuesApi, techniciansApi } from '@/services/api';
+import type { Issue, Technician, UpdateIssueDto } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Filter, MoreHorizontal, Search } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+
+const UNASSIGNED_VALUE = "unassigned";
 
 const statusColors = {
     new: 'bg-blue-500',
@@ -32,6 +41,20 @@ const priorityColors = {
     critical: 'bg-red-500',
 };
 
+const statusLabels = {
+    new: 'Nowe',
+    in_progress: 'W trakcie',
+    done: 'Rozwiązane',
+    closed: 'Zamknięte',
+};
+
+const priorityLabels = {
+    low: 'Niski',
+    medium: 'Średni',
+    high: 'Wysoki',
+    critical: 'Krytyczny',
+};
+
 export const IssuesList = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<Issue['status'] | 'all'>('all');
@@ -42,6 +65,11 @@ export const IssuesList = () => {
     const { data: issues, isLoading } = useQuery({
         queryKey: ['issues'],
         queryFn: issuesApi.getIssues,
+    });
+
+    const { data: technicians } = useQuery({
+        queryKey: ['technicians'],
+        queryFn: techniciansApi.getTechnicians,
     });
 
     const updateIssueMutation = useMutation({
@@ -65,6 +93,19 @@ export const IssuesList = () => {
 
     const handleStatusChange = (issueId: number, newStatus: Issue['status']) => {
         updateIssueMutation.mutate({ id: issueId, data: { status: newStatus } });
+    };
+
+    const handlePriorityChange = (issueId: number, newPriority: Issue['priority']) => {
+        updateIssueMutation.mutate({ id: issueId, data: { priority: newPriority } });
+    };
+
+    const handleTechnicianAssign = (issueId: number, value: string) => {
+        updateIssueMutation.mutate({
+            id: issueId,
+            data: {
+                technicianId: value === UNASSIGNED_VALUE ? null : parseInt(value)
+            }
+        });
     };
 
     if (isLoading) {
@@ -101,6 +142,7 @@ export const IssuesList = () => {
                         <DropdownMenuItem onClick={() => setStatusFilter('new')}>Nowe</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setStatusFilter('in_progress')}>W trakcie</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setStatusFilter('done')}>Rozwiązane</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setStatusFilter('closed')}>Zamknięte</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -131,7 +173,7 @@ export const IssuesList = () => {
                             <TableHead>Status</TableHead>
                             <TableHead>Priorytet</TableHead>
                             <TableHead>Data utworzenia</TableHead>
-                            <TableHead>Przypisany do</TableHead>
+                            <TableHead className="min-w-[200px]">Przypisany do</TableHead>
                             <TableHead className="w-[50px]"></TableHead>
                         </TableRow>
                     </TableHeader>
@@ -147,21 +189,33 @@ export const IssuesList = () => {
                                 </TableCell>
                                 <TableCell>
                                     <Badge className={`${statusColors[issue.status]} text-white`}>
-                                        {issue.status === 'new' && 'Nowe'}
-                                        {issue.status === 'in_progress' && 'W trakcie'}
-                                        {issue.status === 'done' && 'Rozwiązane'}
+                                        {statusLabels[issue.status]}
                                     </Badge>
                                 </TableCell>
                                 <TableCell>
                                     <Badge className={`${priorityColors[issue.priority]} text-white`}>
-                                        {issue.priority === 'low' && 'Niski'}
-                                        {issue.priority === 'medium' && 'Średni'}
-                                        {issue.priority === 'high' && 'Wysoki'}
-                                        {issue.priority === 'critical' && 'Krytyczny'}
+                                        {priorityLabels[issue.priority]}
                                     </Badge>
                                 </TableCell>
                                 <TableCell>{new Date(issue.createdAt).toLocaleString()}</TableCell>
-                                <TableCell>{issue.technician ? `${issue.technician.firstName} ${issue.technician.lastName}` : '-'}</TableCell>
+                                <TableCell>
+                                    <Select
+                                        value={issue.technician?.id?.toString() || UNASSIGNED_VALUE}
+                                        onValueChange={(value) => handleTechnicianAssign(issue.id, value)}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Wybierz technika" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value={UNASSIGNED_VALUE}>Brak przypisania</SelectItem>
+                                            {technicians?.map((technician: Technician) => (
+                                                <SelectItem key={technician.id} value={technician.id.toString()}>
+                                                    {technician.firstName} {technician.lastName}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </TableCell>
                                 <TableCell>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -174,24 +228,27 @@ export const IssuesList = () => {
                                             <DropdownMenuItem>Zobacz szczegóły</DropdownMenuItem>
                                             <DropdownMenuItem>Edytuj</DropdownMenuItem>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem
-                                                onClick={() => handleStatusChange(issue.id, 'in_progress')}
-                                                disabled={issue.status === 'in_progress'}
-                                            >
-                                                Oznacz jako w trakcie
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                onClick={() => handleStatusChange(issue.id, 'done')}
-                                                disabled={issue.status === 'done'}
-                                            >
-                                                Oznacz jako rozwiązane
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem
-                                                onClick={() => handleStatusChange(issue.id, 'closed')}
-                                                disabled={issue.status === 'closed'}
-                                            >
-                                                Zamknij zgłoszenie
-                                            </DropdownMenuItem>
+                                            <DropdownMenuLabel>Status</DropdownMenuLabel>
+                                            {Object.entries(statusLabels).map(([value, label]) => (
+                                                <DropdownMenuItem
+                                                    key={value}
+                                                    onClick={() => handleStatusChange(issue.id, value as Issue['status'])}
+                                                    disabled={issue.status === value}
+                                                >
+                                                    Oznacz jako {label.toLowerCase()}
+                                                </DropdownMenuItem>
+                                            ))}
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuLabel>Priorytet</DropdownMenuLabel>
+                                            {Object.entries(priorityLabels).map(([value, label]) => (
+                                                <DropdownMenuItem
+                                                    key={value}
+                                                    onClick={() => handlePriorityChange(issue.id, value as Issue['priority'])}
+                                                    disabled={issue.priority === value}
+                                                >
+                                                    Ustaw priorytet: {label}
+                                                </DropdownMenuItem>
+                                            ))}
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>

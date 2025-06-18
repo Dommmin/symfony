@@ -9,11 +9,11 @@ use App\DTO\IssueResponseDTO;
 use App\DTO\IssueUpdateDTO;
 use App\DTO\PaginationRequestDTO;
 use App\Entity\IssueStatus;
+use App\Entity\IssuePriority;
 use App\Entity\User;
 use App\Message\EmailNotificationMessage;
 use App\Repository\TechnicianRepository;
 use App\Service\IssueService;
-use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
@@ -32,6 +32,7 @@ class IssueController extends AbstractController
     }
 
     #[Route('', name: 'index', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function index(#[MapQueryString] PaginationRequestDTO $paginationDTO): Response
     {
         $paginatedResponse = $this->issueService->getPaginatedIssues($paginationDTO);
@@ -72,16 +73,33 @@ class IssueController extends AbstractController
             return $this->json(['error' => 'Forbidden'], Response::HTTP_FORBIDDEN);
         }
 
+        $issueId = Uuid::fromBinary($issue->getId()->toBinary())->toRfc4122();
+
         if ($dto->status) {
             $issue->setStatus(IssueStatus::from($dto->status));
             $messageBus->dispatch(new EmailNotificationMessage(
                 $issue->getUser()->getEmail(),
                 'Zmiana statusu zgłoszenia',
-                sprintf(
-                    'Status Twojego zgłoszenia #%s został zmieniony na: %s',
-                    Uuid::fromBinary($issue->getId()->toBinary())->toRfc4122(),
-                    $issue->getStatus()->value
-                )
+                'emails/issue/status_changed.html.twig',
+                [
+                    'issue_id' => $issueId,
+                    'issue' => $issue,
+                    'status' => $issue->getStatus()->value,
+                ]
+            ));
+        }
+
+        if ($dto->priority) {
+            $issue->setPriority(IssuePriority::from($dto->priority));
+            $messageBus->dispatch(new EmailNotificationMessage(
+                $issue->getUser()->getEmail(),
+                'Zmiana priorytetu zgłoszenia',
+                'emails/issue/priority_changed.html.twig',
+                [
+                    'issue_id' => $issueId,
+                    'issue' => $issue,
+                    'priority' => $issue->getPriority()->value,
+                ]
             ));
         }
 
@@ -92,6 +110,29 @@ class IssueController extends AbstractController
             }
 
             $issue->setTechnician($technician);
+
+            // Powiadomienie dla użytkownika
+            $messageBus->dispatch(new EmailNotificationMessage(
+                $issue->getUser()->getEmail(),
+                'Przypisanie technika do zgłoszenia',
+                'emails/issue/technician_assigned.html.twig',
+                [
+                    'issue_id' => $issueId,
+                    'issue' => $issue,
+                    'technician' => $technician,
+                ]
+            ));
+
+            // Powiadomienie dla technika
+            $messageBus->dispatch(new EmailNotificationMessage(
+                $technician->getEmail(),
+                'Nowe zgłoszenie do obsługi',
+                'emails/issue/new_issue_assigned.html.twig',
+                [
+                    'issue_id' => $issueId,
+                    'issue' => $issue,
+                ]
+            ));
         }
 
         $this->issueService->updateIssue($issue);

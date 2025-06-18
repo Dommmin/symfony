@@ -1,5 +1,16 @@
 import { useAuthStore } from '@/features/auth/stores/authStore';
-import type { AuthResponse, CreateIssueDto, Issue, LoginDto, RegisterDto, UpdateIssueDto, User } from '@/types';
+import type {
+    AuthResponse,
+    CreateIssueDto,
+    CreateTechnicianDto,
+    Issue,
+    LoginDto,
+    RegisterDto,
+    Technician,
+    UpdateIssueDto,
+    UpdateTechnicianDto,
+    User
+} from '@/types';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://api.symfony.local';
@@ -81,9 +92,28 @@ export const issuesApi = {
 };
 
 export const techniciansApi = {
-    getTechnicians: async () => {
-        const response = await api.get('/technicians');
+    getTechnicians: async (): Promise<Technician[]> => {
+        const response = await api.get<{ items: Technician[] }>('/technicians');
+        return response.data.items;
+    },
+
+    getTechnician: async (id: number): Promise<Technician> => {
+        const response = await api.get<Technician>(`/technicians/${id}`);
         return response.data;
+    },
+
+    createTechnician: async (data: CreateTechnicianDto): Promise<Technician> => {
+        const response = await api.post<Technician>('/technicians', data);
+        return response.data;
+    },
+
+    updateTechnician: async (id: number, data: UpdateTechnicianDto): Promise<Technician> => {
+        const response = await api.patch<Technician>(`/technicians/${id}`, data);
+        return response.data;
+    },
+
+    deleteTechnician: async (id: number): Promise<void> => {
+        await api.delete(`/technicians/${id}`);
     },
 };
 
