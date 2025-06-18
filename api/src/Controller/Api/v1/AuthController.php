@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\v1;
 
+use Exception;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -49,7 +50,7 @@ class AuthController extends AbstractController
 
         try {
             $user = $userProvider->loadUserByIdentifier($data['email']);
-        } catch (\Exception) {
+        } catch (Exception) {
             return new JsonResponse(['error' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
         }
 

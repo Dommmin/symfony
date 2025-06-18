@@ -15,7 +15,7 @@ class MeController extends AbstractController
     #[Route('/v1/me', name: 'api_v1_me', methods: ['GET'])]
     public function me(#[CurrentUser] ?User $user): JsonResponse
     {
-        if (!$user instanceof \App\Entity\User) {
+        if (!$user instanceof User) {
             throw $this->createAccessDeniedException('Not authenticated');
         }
 

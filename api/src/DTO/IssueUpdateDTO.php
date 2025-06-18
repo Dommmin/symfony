@@ -9,7 +9,7 @@ use App\Entity\IssueStatus;
 
 class IssueUpdateDTO
 {
-    #[Assert\Choice(callback: \App\Entity\IssueStatus::class . '::values')]
+    #[Assert\Choice(callback: IssueStatus::class . '::values')]
     public ?string $status = null;
 
     #[Assert\Positive]

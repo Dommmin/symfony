@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use App\Repository\IssueRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -32,7 +33,7 @@ class Issue
         #[ORM\Column(length: 255)]
         #[Groups(['user:read', 'issue:write', 'admin:read'])]
         private string $title,
-        #[ORM\Column(type: \Doctrine\DBAL\Types\Types::TEXT)]
+        #[ORM\Column(type: Types::TEXT)]
         #[Groups(['user:read', 'issue:write', 'admin:read'])]
         private string $description,
         #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'issues')]

@@ -22,6 +22,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Messenger\MessageBusInterface;
 use App\Message\EmailNotificationMessage;
 use App\Entity\User;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 
 #[Route('/issues', name: 'issues_')]
 class IssueController extends AbstractController
@@ -34,14 +36,30 @@ class IssueController extends AbstractController
 
         $page = max(1, (int)$request->query->get('page', 1));
         $limit = min(50, (int)$request->query->get('limit', 10));
-        $criteria = [];
-        $criteria['user'] = $request->query->get('user') ?: $user;
+        
+        $queryBuilder = $issueRepository->createQueryBuilder('i')
+            ->orderBy('i.id', 'DESC');
 
-        if ($request->query->get('status')) {
-            $criteria['status'] = $request->query->get('status');
+        // Apply filters
+        if ($requestedUser = $request->query->get('user')) {
+            $queryBuilder->andWhere('i.user = :user')
+                ->setParameter('user', $requestedUser);
+        } else {
+            $queryBuilder->andWhere('i.user = :user')
+                ->setParameter('user', $user);
         }
 
-        $issues = $issueRepository->findBy($criteria, ['id' => 'DESC'], $limit, ($page-1)*$limit);
+        if ($status = $request->query->get('status')) {
+            $queryBuilder->andWhere('i.issueStatus = :status')
+                ->setParameter('status', $status);
+        }
+
+        $pagerfanta = new Pagerfanta(new QueryAdapter($queryBuilder));
+        $pagerfanta->setMaxPerPage($limit);
+        $pagerfanta->setCurrentPage($page);
+
+        $results = iterator_to_array($pagerfanta->getCurrentPageResults());
+        
         $data = array_map(fn($i): array => [
             'id' => $i->getId(),
             'title' => $i->getTitle(),
@@ -50,9 +68,19 @@ class IssueController extends AbstractController
             'createdAt' => $i->getCreatedAt()->format(DATE_ATOM),
             'user' => $i->getUser()->getId(),
             'technician' => $i->getTechnician()?->getId(),
-        ], $issues);
+        ], $results);
 
-        return $this->json(['items' => $data, 'page' => $page, 'limit' => $limit]);
+        return $this->json([
+            'items' => $data,
+            'pagination' => [
+                'current_page' => $pagerfanta->getCurrentPage(),
+                'per_page' => $pagerfanta->getMaxPerPage(),
+                'total_pages' => $pagerfanta->getNbPages(),
+                'total_items' => $pagerfanta->getNbResults(),
+                'has_previous_page' => $pagerfanta->hasPreviousPage(),
+                'has_next_page' => $pagerfanta->hasNextPage(),
+            ]
+        ]);
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
