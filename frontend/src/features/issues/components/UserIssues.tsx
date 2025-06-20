@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import type { Issue } from '@/types';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -20,7 +21,7 @@ const getStatusColor = (status: string) => {
 };
 
 export const UserIssues = () => {
-    const { data: issues, isLoading } = useIssues();
+    const { data: issues = [], isLoading } = useIssues();
     const user = useAuthStore((state) => state.user);
 
     if (isLoading) {
@@ -31,7 +32,7 @@ export const UserIssues = () => {
         );
     }
 
-    const userIssues = issues?.filter((issue) => issue.user.id === user?.id) || [];
+    const userIssues = (issues as Issue[])?.filter((issue: Issue) => issue.user.id === user?.id) || [];
 
     return (
         <div className="space-y-6">
@@ -51,7 +52,7 @@ export const UserIssues = () => {
                         <p className="text-muted-foreground">Nie masz jeszcze żadnych zgłoszeń.</p>
                     ) : (
                         <div className="space-y-4">
-                            {userIssues.map((issue) => (
+                            {userIssues.map((issue: Issue) => (
                                 <div key={issue.id} className="flex items-center justify-between border-b pb-4 last:border-0">
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2">

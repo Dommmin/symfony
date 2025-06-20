@@ -18,7 +18,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { issuesApi, techniciansApi } from '@/services/api';
-import type { Issue, PaginatedResponse, Technician, UpdateIssueDto } from '@/types';
+import type { Issue, UpdateIssueDto } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, Filter, MoreHorizontal, Search } from 'lucide-react';
 import { useState } from 'react';

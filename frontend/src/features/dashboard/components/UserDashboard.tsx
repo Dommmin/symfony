@@ -4,9 +4,10 @@ import { useAuthStore } from '@/features/auth/stores/authStore';
 import { Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import type { Issue } from '@/types';
 
 export const UserDashboard = () => {
-    const { data: issues, isLoading } = useIssues();
+    const { data: issues = [], isLoading } = useIssues();
     const user = useAuthStore((state) => state.user);
 
     if (isLoading) {
@@ -17,10 +18,10 @@ export const UserDashboard = () => {
         );
     }
 
-    const userIssues = issues?.filter((issue) => issue.user.id === user?.id) || [];
-    const newIssues = userIssues.filter((issue) => issue.status === 'new').length;
-    const inProgressIssues = userIssues.filter((issue) => issue.status === 'in_progress').length;
-    const doneIssues = userIssues.filter((issue) => issue.status === 'done').length;
+    const userIssues = (issues as Issue[])?.filter((issue: Issue) => issue.user.id === user?.id) || [];
+    const newIssues = userIssues.filter((issue: Issue) => issue.status === 'new').length;
+    const inProgressIssues = userIssues.filter((issue: Issue) => issue.status === 'in_progress').length;
+    const doneIssues = userIssues.filter((issue: Issue) => issue.status === 'done').length;
 
     return (
         <div className="space-y-6">
@@ -67,7 +68,7 @@ export const UserDashboard = () => {
                         <p className="text-muted-foreground">Nie masz jeszcze żadnych zgłoszeń.</p>
                     ) : (
                         <div className="space-y-4">
-                            {userIssues.slice(0, 5).map((issue) => (
+                            {userIssues.slice(0, 5).map((issue: Issue) => (
                                 <div key={issue.id} className="flex items-center justify-between border-b pb-4 last:border-0">
                                     <div>
                                         <h3 className="font-medium">{issue.title}</h3>

@@ -32,7 +32,10 @@ export const NewIssue = () => {
 
     const onSubmit = async (data: NewIssueFormData) => {
         try {
-            await createIssue.mutateAsync(data);
+            await createIssue.mutateAsync({
+                ...data,
+                priority: 'low'
+            });
             toast.success('Zgłoszenie zostało utworzone');
             navigate('/issues');
         } catch (error) {
