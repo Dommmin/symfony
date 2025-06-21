@@ -18,7 +18,9 @@ export const UserDashboard = () => {
         );
     }
 
-    const userIssues = (issues as Issue[])?.filter((issue: Issue) => issue.user.id === user?.id) || [];
+    // Ensure issues is an array before filtering
+    const issuesArray = Array.isArray(issues) ? issues : [];
+    const userIssues = issuesArray.filter((issue: Issue) => issue.user?.id === user?.id);
     const newIssues = userIssues.filter((issue: Issue) => issue.status === 'new').length;
     const inProgressIssues = userIssues.filter((issue: Issue) => issue.status === 'in_progress').length;
     const doneIssues = userIssues.filter((issue: Issue) => issue.status === 'done').length;

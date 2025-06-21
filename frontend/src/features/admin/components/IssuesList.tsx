@@ -280,7 +280,7 @@ export const IssuesList = () => {
 
             <div className="flex items-center justify-between px-2">
                 <div className="text-sm text-muted-foreground">
-                    Strona {currentPage} z {issuesData.totalPages}
+                    Strona {currentPage} z {issuesData.pagination.total_pages}
                 </div>
                 <div className="flex items-center space-x-2">
                     <Button
@@ -296,7 +296,7 @@ export const IssuesList = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === issuesData.totalPages}
+                        disabled={currentPage === issuesData.pagination.total_pages}
                     >
                         Następna
                         <ChevronRight className="h-4 w-4" />

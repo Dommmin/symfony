@@ -32,7 +32,9 @@ export const UserIssues = () => {
         );
     }
 
-    const userIssues = (issues as Issue[])?.filter((issue: Issue) => issue.user.id === user?.id) || [];
+    // Ensure issues is an array before filtering
+    const issuesArray = Array.isArray(issues) ? issues : [];
+    const userIssues = issuesArray.filter((issue: Issue) => issue.user?.id === user?.id);
 
     return (
         <div className="space-y-6">

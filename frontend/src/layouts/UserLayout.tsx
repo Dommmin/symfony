@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import { Bell, FileText, Home, LogOut, Menu, PlusCircle } from 'lucide-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
@@ -16,6 +17,7 @@ const navigation = [
 export const UserLayout = () => {
     const location = useLocation();
     const { logout } = useAuth();
+    const isAdmin = useAuthStore((state) => state.isAdmin);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
@@ -55,12 +57,14 @@ export const UserLayout = () => {
                             </nav>
                             <Separator />
                             <div className="p-4">
-                                <Link to="/admin">
-                                    <Button variant="outline" className="w-full justify-start space-x-3">
-                                        <Home className="h-5 w-5" />
-                                        <span>Panel administracyjny</span>
-                                    </Button>
-                                </Link>
+                                {isAdmin && 
+                                    <Link to="/admin">
+                                        <Button variant="outline" className="w-full justify-start space-x-3">
+                                            <Home className="h-5 w-5" />
+                                            <span>Panel administracyjny</span>
+                                        </Button>
+                                    </Link>
+                                }
                                 <Button
                                     variant="ghost"
                                     className="w-full justify-start space-x-3 text-red-600 hover:bg-red-50 hover:text-red-700"
@@ -101,12 +105,14 @@ export const UserLayout = () => {
                         </nav>
                         <Separator />
                         <div className="p-4">
-                            <Link to="/admin">
-                                <Button variant="outline" className="w-full justify-start space-x-3">
-                                    <Home className="h-5 w-5" />
-                                    <span>Panel administracyjny</span>
-                                </Button>
-                            </Link>
+                            {isAdmin && 
+                                <Link to="/admin">
+                                    <Button variant="outline" className="w-full justify-start space-x-3">
+                                        <Home className="h-5 w-5" />
+                                        <span>Panel administracyjny</span>
+                                    </Button>
+                                </Link>
+                            }
                             <Button
                                 variant="ghost"
                                 className="w-full justify-start space-x-3 text-red-600 hover:bg-red-50 hover:text-red-700"
