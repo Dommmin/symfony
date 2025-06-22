@@ -287,7 +287,7 @@ export const IssuesList = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
+                        disabled={!issuesData.pagination.has_previous_page}
                     >
                         <ChevronLeft className="h-4 w-4" />
                         Poprzednia
@@ -296,7 +296,7 @@ export const IssuesList = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === issuesData.pagination.total_pages}
+                        disabled={!issuesData.pagination.has_next_page}
                     >
                         Następna
                         <ChevronRight className="h-4 w-4" />

@@ -36,10 +36,14 @@ export type Issue = {
 
 export type PaginatedResponse<T> = {
     items: T[];
-    total: number;
-    page: number;
-    perPage: number;
-    totalPages: number;
+    pagination: {
+        current_page: number;
+        per_page: number;
+        total_pages: number;
+        total_items: number;
+        has_previous_page: boolean;
+        has_next_page: boolean;
+    };
 };
 
 export type PaginationParams = {
